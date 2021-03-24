@@ -31,7 +31,7 @@ class LocationBackgroundConsentActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        setResult(LocationActivity.RESULT_CODE)
+        setResult(LocationActivity.PERMISSION_RESULT_CODE)
         finish()
     }
 

@@ -1,19 +1,23 @@
 package com.kvsoftware.backgroundlocation
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.location.*
 
 class LocationService : Service() {
 
     companion object {
-        private const val NOTIFICATION_ID = 123
+        const val ACTION_LOCATION = "action_location"
+        const val ARG_LOCATION = "arg_location"
+
+        private const val NOTIFICATION_ID = 1001
         private const val CHANNEL_ID = "channel_id"
         private const val CHANNEL_NAME = "Channel Name"
     }
@@ -32,7 +36,11 @@ class LocationService : Service() {
             }
 
             override fun onLocationResult(p0: LocationResult?) {
-                p0?.lastLocation?.let { }
+                p0?.lastLocation?.let {
+                    val intent = Intent(ACTION_LOCATION)
+                    intent.putExtra(ARG_LOCATION, it)
+                    LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
+                }
             }
         }
     }
@@ -58,12 +66,15 @@ class LocationService : Service() {
 
     override fun onBind(p0: Intent?): IBinder? = null
 
+    @SuppressLint("MissingPermission")
     private fun startLocation() {
-        Log.i("Kv", "startLocation")
+        if (LocationPermissionHelper.hasLocationPermission(this)) {
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
+        }
     }
 
     private fun stopLocation() {
-        Log.i("Kv", "stopLocation")
+        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
     private fun displayForegroundNotification() {
