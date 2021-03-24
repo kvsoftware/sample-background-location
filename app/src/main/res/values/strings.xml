@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">sample-background-location</string>
+    <string name="notification_update_location">Updating location…</string>
+    <string name="activity_location_background_consent_button_allow_permissions">Allow permissions</string>
+    <string name="activity_location_background_consent_tv_title">Use your location.</string>
+    <string name="activity_location_background_consent_tv_prominent_disclosure">Prominent disclosure to the user, describing the data being accessed.</string>
+    <string name="activity_location_background_consent_tv_how_it_being_used">How it\'s being used.</string>
 </resources>
