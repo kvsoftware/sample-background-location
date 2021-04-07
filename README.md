@@ -2,7 +2,7 @@
 This is sample application demonstrates how to implement the background location which introduced in Android 10 (API level 29).
 
 ## Step
-1. Add location permission and foreground permission in AndroidManifest.xml file.
+1. Add location permission and foreground service permission in AndroidManifest.xml file.
 ```
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -121,7 +121,7 @@ class LocationService : Service() {
     }
 ```
 
-5. In the Activity, create BroadcastReceiver to receive the location which broadcast from the 'LocationService'.
+5. In the 'LocationActivity', create broadcast receiver to receive the location which broadcast from the 'LocationService'.
 ```
 class LocationActivity : AppCompatActivity() {
 ...
@@ -136,5 +136,46 @@ class LocationActivity : AppCompatActivity() {
 ...
 ```
 
-6. As the new policy of Google Play, need the activity to provide an in-app disclosure of your background location access.
-https://www.youtube.com/watch?v=b0I1Xq_iSK4
+6. Create the 'LocationBackgroundConsentActivity' to provide an in-app disclosure of your background location access due to new policy of Google Play as below.
+
+[![](https://yt-embed.herokuapp.com/embed?v=b0I1Xq_iSK4)](https://www.youtube.com/watch?v=b0I1Xq_iSK4)
+
+7. In the activity, start 'LocationService' when location permission are granted but open 'LocationBackgroundConsentActivity' when location are not granted.
+```
+class LocationActivity : AppCompatActivity() {
+...
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_location)
+        initializeMap()
+
+        if (!LocationPermissionHelper.hasLocationPermission(this)) {
+            val intent = Intent(this, LocationBackgroundConsentActivity::class.java)
+            startActivityForResult(intent, PERMISSION_REQUEST_CODE)
+        } else {
+            startService()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopService()
+    }
+
+    private fun startService() {
+        val intent = Intent(this, LocationService::class.java)
+        startService(intent)
+        LocalBroadcastManager
+            .getInstance(this)
+            .registerReceiver(broadcastReceiver, IntentFilter(LocationService.ACTION_LOCATION))
+    }
+
+    private fun stopService() {
+        val intent = Intent(this, LocationService::class.java)
+        stopService(intent)
+        LocalBroadcastManager
+             .getInstance(this)
+             .unregisterReceiver(broadcastReceiver)
+    }
+...
+```
