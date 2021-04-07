@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 
 object LocationPermissionHelper {
+
     private const val LOCATION_COARSE_PERMISSION = Manifest.permission.ACCESS_COARSE_LOCATION
     private const val LOCATION_FINE_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION
 

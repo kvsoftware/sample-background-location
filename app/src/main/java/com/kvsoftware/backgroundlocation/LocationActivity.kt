@@ -19,8 +19,9 @@ import com.google.android.gms.maps.model.MarkerOptions
 class LocationActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
-        const val PERMISSION_REQUEST_CODE = 1000
-        const val PERMISSION_RESULT_CODE = 1001
+        const val PERMISSION_REQUEST_CODE = 1001
+        const val PERMISSION_RESULT_CODE_ALLOWED = 2001
+        const val PERMISSION_RESULT_CODE_DENIED = 2002
         const val ZOOM_LEVEL = 15f
     }
 
@@ -31,21 +32,12 @@ class LocationActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_location)
         initializeMap()
-        startService()
-    }
 
-    override fun onResume() {
-        super.onResume()
         if (!LocationPermissionHelper.hasLocationPermission(this)) {
             val intent = Intent(this, LocationBackgroundConsentActivity::class.java)
             startActivityForResult(intent, PERMISSION_REQUEST_CODE)
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PERMISSION_REQUEST_CODE && resultCode == PERMISSION_RESULT_CODE) {
-            finish()
+        } else {
+            startService()
         }
     }
 
@@ -56,6 +48,16 @@ class LocationActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(p0: GoogleMap?) {
         googleMap = p0
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            when (resultCode) {
+                PERMISSION_RESULT_CODE_ALLOWED -> startService()
+                PERMISSION_RESULT_CODE_DENIED -> finish()
+            }
+        }
     }
 
     private fun initializeMap() {
