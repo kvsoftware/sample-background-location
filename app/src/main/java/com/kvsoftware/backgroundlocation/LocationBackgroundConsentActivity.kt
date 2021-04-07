@@ -26,12 +26,13 @@ class LocationBackgroundConsentActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         if (LocationPermissionHelper.hasLocationPermission(this)) {
+            setResult(LocationActivity.PERMISSION_RESULT_CODE_ALLOWED)
             finish()
         }
     }
 
     override fun onBackPressed() {
-        setResult(LocationActivity.PERMISSION_RESULT_CODE)
+        setResult(LocationActivity.PERMISSION_RESULT_CODE_DENIED)
         finish()
     }
 
